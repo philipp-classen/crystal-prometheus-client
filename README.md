@@ -5,7 +5,7 @@ A suite of instrumentation metric primitives for Crystal that can be exposed thr
 Note: This repository has been forked from https://github.com/inkel/crystal-prometheus-client.
 It is close to the original work, but took some liberties with the API and added some missing functionality.
 
-[![Build Status](https://travis-ci.org/philipp-classen/crystal-prometheus-client.svg?branch=master)](https://travis-ci.org/inkel/crystal-prometheus-client)
+[![Build Status](https://travis-ci.org/philipp-classen/crystal-prometheus-client.svg?branch=master)](https://travis-ci.org/philipp-classen/crystal-prometheus-client)
 
 ## Installation
 
