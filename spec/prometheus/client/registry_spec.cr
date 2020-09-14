@@ -16,7 +16,7 @@ describe Prometheus::Client::Registry do
 
   describe "#register" do
     it "registers a new metric container and returns it" do
-      metric = Prometheus::Client::Metric.new(:test, "foo")
+      metric = Prometheus::Client::Counter.new(:test, "foo")
 
       with_registry do |registry|
         registry.register(metric).should eq(metric)
@@ -24,7 +24,7 @@ describe Prometheus::Client::Registry do
     end
 
     it "raises an exception if a metric name gets registered twice" do
-      metric = Prometheus::Client::Metric.new(:test, "foo")
+      metric = Prometheus::Client::Counter.new(:test, "foo")
 
       with_registry do |registry|
         registry.register(metric)
@@ -39,7 +39,7 @@ describe Prometheus::Client::Registry do
   describe "#exist?" do
     it "returns true if a metric name has been registered" do
       with_registry do |registry|
-        registry.register(Prometheus::Client::Metric.new(:test, "foo"))
+        registry.register(Prometheus::Client::Counter.new(:test, "foo"))
 
         registry.exist?(:test).should eq(true)
       end

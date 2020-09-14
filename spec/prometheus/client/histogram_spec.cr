@@ -37,22 +37,18 @@ describe Prometheus::Client::Histogram do
     end
   end
 
-  describe "#observe" do
-    it "records the given value" do
-      with_histogram do |histogram|
-        histogram.observe(5.0, {:foo => "bar"}).should be_a(Prometheus::Client::Histogram::Value)
-      end
-    end
-  end
-
   describe "#get" do
-    it "returns a set of buckets values" do
+    it "returns the expected buckets values" do
       with_histogram_and_values do |histogram|
-        histogram.get({:foo => "bar"}).should eq({2.5 => 0.0, 5 => 2.0, 10 => 3.0})
+        histogram.get({:foo => "bar"}).bucket_values.should eq([
+          0, # <= 2.5,
+          2, # <= 5.0,
+          3, # <= 10.0
+        ])
       end
     end
 
-    it "returns a value which responds to #sum and #total" do
+    it "returns a value which responds to #sum and #count" do
       with_histogram_and_values do |histogram|
         value = histogram.get({:foo => "bar"})
 
@@ -63,7 +59,11 @@ describe Prometheus::Client::Histogram do
 
     it "uses zero as default value" do
       with_histogram_and_values do |histogram|
-        histogram.get({:foo => "foo"}).should eq({2.5 => 0.0, 5 => 0.0, 10 => 0.0})
+        histogram.get({:foo => "foo"}).bucket_values.should eq([
+          0, # <= 2.5
+          0, # <= 5.0
+          0, # <= 10.0
+        ])
       end
     end
   end

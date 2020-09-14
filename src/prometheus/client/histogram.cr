@@ -47,8 +47,8 @@ module Prometheus
         def initialize(buckets : Array(Float64))
           super()
           @sum = 0.0
-          @count = 0
-          @bucket_values = Array(Float64).new(buckets.size, 0.0)
+          @count = 0_i64
+          @bucket_values = Array(Int64).new(buckets.size, 0)
         end
 
         def observe(buckets, value : Float64)
