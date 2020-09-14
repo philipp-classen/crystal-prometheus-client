@@ -28,7 +28,7 @@ module Prometheus
       # Note: In general, you do not want to call this function directly, but use
       # Prometheus::Client::to_text
       def to_text(io)
-        io << "# HELP #{name} #{docstring}\n" unless docstring.empty?
+        io << "# HELP #{name} #{docstring}\n"
         to_text_impl(io)
       end
 
@@ -37,7 +37,7 @@ module Prometheus
       RE_NAME = /\A[a-zA-Z_:][a-zA-Z0-9_:]*\Z/
 
       private def validate_name
-        raise ArgumentError.new("metric name must match #{RE_NAME}") unless name.to_s =~ RE_NAME
+        raise ArgumentError.new("metric name #{name} did not match #{RE_NAME}") unless name.to_s =~ RE_NAME
       end
 
       private def validate_docstring
@@ -46,6 +46,7 @@ module Prometheus
 
       private def label_set_for(labels : Hash(Symbol, String))
         @validator.validate(labels)
+        @base_labels.merge(labels)
       end
 
       # Helper function to format labels as specified in the text based format:
