@@ -39,7 +39,7 @@ describe Prometheus::Client::Registry do
   describe "#exist?" do
     it "returns true if a metric name has been registered" do
       with_registry do |registry|
-        registry.register(metric = Prometheus::Client::Metric.new(:test, "foo"))
+        registry.register(Prometheus::Client::Metric.new(:test, "foo"))
 
         registry.exist?(:test).should eq(true)
       end

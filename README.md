@@ -2,7 +2,10 @@
 
 A suite of instrumentation metric primitives for Crystal that can be exposed through a HTTP interface. Intended to be used together with a [Prometheus server][prometheus].
 
-[![Build Status](https://travis-ci.org/inkel/crystal-prometheus-client.svg?branch=master)](https://travis-ci.org/inkel/crystal-prometheus-client)
+Note: This repository has been forked from https://github.com/inkel/crystal-prometheus-client.
+It is close to the original work, but took some liberties with the API and added some missing functionality.
+
+[![Build Status](https://travis-ci.org/philipp-classen/crystal-prometheus-client.svg?branch=master)](https://travis-ci.org/inkel/crystal-prometheus-client)
 
 ## Installation
 
@@ -11,7 +14,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   prometheus:
-    github: inkel/crystal-prometheus-client
+    github:  philipp-classen/crystal-prometheus-client
 ```
 
 ## Usage
@@ -30,7 +33,7 @@ http_requests = Prometheus::Client::Counter.new(:http_requests, "A counter of HT
 prometheus.register(http_requests)
 
 # start using the counter
-http_requests.increment
+http_requests.inc
 ```
 ## Metrics
 
@@ -43,11 +46,17 @@ Counter is a metric that exposes merely a sum or tally of things.
 ```crystal
 counter = Prometheus::Client::Counter.new(:service_requests_total, "...")
 
-# increment the counter for a given label set
-counter.increment({ :service => "foo" })
+# increment counter
+counter.inc
 
-# increment by a given value
-counter.increment({ :service => "bar" }, 5)
+# increment counter by a given value
+counter.inc(7)
+
+# increment the counter for a given label set
+counter.inc({ :service => "foo" })
+
+# increment by a given value for a given label
+counter.inc(5, { :service => "bar" })
 
 # get current value for a given label set
 counter.get({ :service => "bar" })
@@ -63,7 +72,7 @@ thereof.
 gauge = Prometheus::Client::Gauge.new(:room_temperature_celsius, "...")
 
 # set a value
-gauge.set({ :room => "kitchen" }, 21.534)
+gauge.set(21.534, { :room => "kitchen" })
 
 # retrieve the current value for a given label set
 gauge.get({ :room => "kitchen" })
@@ -75,10 +84,10 @@ Also you can use gauge as the bi-directional counter:
 ```crystal
 gauge = Prometheus::Client::Gauge.new(:concurrent_requests_total, "...")
 
-gauge.increment({ :service => "foo" })
+gauge.inc({ :service => "foo" })
 # => 1.0
 
-gauge.decrement({ :service => "foo" })
+gauge.dec({ :service => "foo" })
 # => 0.0
 ```
 
@@ -92,34 +101,43 @@ of all observed values.
 histogram = Prometheus::Client::Histogram.new(:service_latency_seconds, "...")
 
 # record a value
-histogram.observe({ :service => "users" }, Benchmark.realtime { service.call(arg) })
+histogram.observe(Benchmark.realtime { service.call(arg) }, { :service => "users" })
 
 # retrieve the current bucket values
 histogram.get({ :service => "users" })
 # => { 0.005 => 3, 0.01 => 15, 0.025 => 18, ..., 2.5 => 42, 5 => 42, 10 = >42 }
 ```
 
-### Summary
-TODO
+### Exporting Metrics
+
+To expose the metrics, the
+[text-based format](https://prometheus.io/docs/instrumenting/exposition_formats/#text-based-format)
+is supported. To generate the text, use `Prometheus::Client.to_text` and setup an HTTP endpoint.
+
+For example, if you are already using [Kemel](https://github.com/kemalcr/kemal), you can
+setup the metrics endpoints like that:
+
+```crystal
+get "/metrics" do
+  Prometheus::Client.to_text
+end
+```
 
 ## Caveats
-* Currently it only supports `Float64`
-* No `HTTP::Handler` middleware (yet)
+* No `HTTP::Handler` middleware
 * No [`Pushgateway`][pushgateway] support
-
-## Development
-
-TODO: Write development instructions here
 
 ## Contributing
 
-1. Fork it ( https://github.com/inkel/crystal-prometheus-client/fork )
+1. Fork it
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)
 5. Create a new Pull Request
 
 ## Contributors
+
+This repository has been forked. The original can be found here:
 
 - [inkel](https://github.com/inkel) Leandro López - creator, maintainer
 

@@ -17,60 +17,60 @@ describe Prometheus::Client::Gauge do
   describe "#set" do
     it "sets a metric value" do
       with_gauge do |gauge|
-        gauge.set({} of Symbol => String, 42.0)
+        gauge.set(42.0)
         gauge.get.should eq(42.0)
       end
     end
 
     it "sets a metric value for a given label set" do
       with_gauge do |gauge|
-        gauge.set({:test => "value"}, 5.0)
+        gauge.set(5.0, {:test => "value"})
         gauge.get({:test => "value"}).should eq(5.0)
         gauge.get({:test => "foobar"}).should eq(0.0)
       end
     end
   end
 
-  describe "#increment" do
+  describe "#inc" do
     it "increments the gauge" do
       with_gauge do |gauge|
-        gauge.increment
+        gauge.inc
         gauge.get.should eq(1.0)
       end
     end
 
     it "increments the gauge by a given value" do
       with_gauge do |gauge|
-        gauge.increment({} of Symbol => String, 5.0)
+        gauge.inc(5.0)
         gauge.get.should eq(5.0)
       end
     end
 
     it "returns the new gauge value" do
       with_gauge do |gauge|
-        gauge.increment.should eq(1.0)
+        gauge.inc.should eq(1.0)
       end
     end
   end
 
-  describe "#decrement" do
+  describe "#dec" do
     it "decrements the gauge" do
       with_gauge do |gauge|
-        gauge.decrement
+        gauge.dec
         gauge.get.should eq(-1.0)
       end
     end
 
     it "decrements the gauge by a given value" do
       with_gauge do |gauge|
-        gauge.decrement({} of Symbol => String, 5.0)
+        gauge.dec(5.0)
         gauge.get.should eq(-5.0)
       end
     end
 
     it "returns the new gauge value" do
       with_gauge do |gauge|
-        gauge.decrement.should eq(-1.0)
+        gauge.dec.should eq(-1.0)
       end
     end
   end

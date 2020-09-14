@@ -3,16 +3,16 @@ require "./metric"
 module Prometheus
   module Client
     class Gauge < Metric
-      def set(value : Float64, labels = {} of Symbol => String)
-        values[label_set_for(labels)] = value
+      def set(value : Number, labels = {} of Symbol => String)
+        values[label_set_for(labels)] = value.to_f64
       end
 
-      def increment(labels = {} of Symbol => String, by : Float64 = 1.0)
-        values[label_set_for(labels)] += by
+      def inc(by : Number = 1.0, labels = {} of Symbol => String)
+        values[label_set_for(labels)] += by.to_f64
       end
 
-      def decrement(labels = {} of Symbol => String, by : Float64 = 1.0)
-        values[label_set_for(labels)] -= by
+      def dec(by : Float64 = 1.0, labels = {} of Symbol => String)
+        values[label_set_for(labels)] -= by.to_f64
       end
 
       private def to_text_impl(io : IO)

@@ -14,17 +14,17 @@ describe Prometheus::Client::Counter do
     end
   end
 
-  describe "#increment" do
+  describe "#inc" do
     it "increments the counter" do
       with_counter do |counter|
-        counter.increment
+        counter.inc
         counter.get.should eq(1.0)
       end
     end
 
     it "increments the counter by a given value" do
       with_counter do |counter|
-        counter.increment({} of Symbol => String, 5.0)
+        counter.inc(5.0)
         counter.get.should eq(5.0)
       end
     end
@@ -32,14 +32,14 @@ describe Prometheus::Client::Counter do
     it "raises ArgumentError on negative increments" do
       with_counter do |counter|
         expect_raises(ArgumentError) do
-          counter.increment({} of Symbol => String, -1.0)
+          counter.inc(-1.0)
         end
       end
     end
 
     it "returns the new counter value" do
       with_counter do |counter|
-        counter.increment.should eq(1.0)
+        counter.inc.should eq(1.0)
       end
     end
   end

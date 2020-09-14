@@ -7,10 +7,10 @@ end
 
 def with_histogram_and_values
   with_histogram do |histogram|
-    histogram.observe({:foo => "bar"}, 3.0)
-    histogram.observe({:foo => "bar"}, 5.2)
-    histogram.observe({:foo => "bar"}, 13.0)
-    histogram.observe({:foo => "bar"}, 4.0)
+    histogram.observe(3.0, {:foo => "bar"})
+    histogram.observe(5.2, {:foo => "bar"})
+    histogram.observe(13.0, {:foo => "bar"})
+    histogram.observe(4.0, {:foo => "bar"})
 
     yield histogram
   end
@@ -40,7 +40,7 @@ describe Prometheus::Client::Histogram do
   describe "#observe" do
     it "records the given value" do
       with_histogram do |histogram|
-        histogram.observe({:foo => "bar"}, 5.0).should be_a(Prometheus::Client::Histogram::Value)
+        histogram.observe(5.0, {:foo => "bar"}).should be_a(Prometheus::Client::Histogram::Value)
       end
     end
   end
@@ -57,7 +57,7 @@ describe Prometheus::Client::Histogram do
         value = histogram.get({:foo => "bar"})
 
         value.sum.should eq(25.2)
-        value.total.should eq(4.0)
+        value.count.should eq(4.0)
       end
     end
 
