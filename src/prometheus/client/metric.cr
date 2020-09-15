@@ -10,6 +10,7 @@ module Prometheus
         validate_docstring
 
         @validator = LabelSetValidator.new
+        @validator.validate!(@base_labels)
       end
 
       def values
@@ -45,7 +46,7 @@ module Prometheus
       end
 
       private def label_set_for(labels : Hash(Symbol, String))
-        @validator.validate(labels)
+        @validator.validate!(labels)
         @base_labels.merge(labels)
       end
 
