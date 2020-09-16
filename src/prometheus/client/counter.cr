@@ -4,6 +4,10 @@ require "../internal-logger"
 module Prometheus
   module Client
     class Counter < Metric
+      def inc(labels = {} of Symbol => String)
+        inc(1.0, labels)
+      end
+
       def inc(by : Number = 1.0, labels = {} of Symbol => String)
         raise ArgumentError.new("increment must be a non-negative number: got #{by}") if by < 0.0
         values[label_set_for(labels)] += by.to_f64
