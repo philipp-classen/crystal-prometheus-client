@@ -13,9 +13,10 @@ module Prometheus
         @validator.validate!(@base_labels)
       end
 
-      def values
-        @values ||= Hash(Hash(Symbol, String), Float64).new { |h, k| h[k] = 0.0 }
-      end
+      abstract def values
+
+      # Cleans all values, thus restoring the state that the object had after construction.
+      abstract def reset!
 
       def get(labels = {} of Symbol => String)
         values[label_set_for(labels)]

@@ -5,6 +5,10 @@ def with_registry
   yield Prometheus::Client::Registry.new
 end
 
+def find_prometheus_exports(exported_text : String)
+  exported_text.lines.reject { |x| x.empty? || x.starts_with?("#") }
+end
+
 describe Prometheus::Client::Registry do
   describe ".new" do
     it "returns a new registry instance" do
@@ -105,6 +109,59 @@ describe Prometheus::Client::Registry do
         histogram.docstring.should eq("lorem ipsum")
         histogram.base_labels.should eq({:bar => "baz"})
         histogram.buckets.should eq([0.5, 1.0, 2.0])
+      end
+    end
+  end
+
+  describe "#to_text" do
+    it "should initially export empty text" do
+      with_registry do |registry|
+        registry.to_text.should eq("")
+      end
+    end
+
+    it "should export a counter to standard text format" do
+      with_registry do |registry|
+        counter = registry.counter(:foo_total, "some comment")
+        counter.inc
+
+        registry.to_text.should eq(<<-OUTPUT
+# HELP foo_total some comment
+# TYPE foo_total counter
+foo_total 1.0
+
+OUTPUT
+        )
+      end
+    end
+
+    it "should export a gauge with label to standard text format" do
+      with_registry do |registry|
+        gauge = registry.gauge(:foo, "some comment", {:bar => "baz"})
+        gauge.set(5.0)
+
+        registry.to_text.should eq(<<-OUTPUT
+# HELP foo some comment
+# TYPE foo gauge
+foo{bar="baz"} 5.0
+
+OUTPUT
+        )
+      end
+    end
+
+    it "should quote labels" do
+      with_registry do |registry|
+        gauge = registry.gauge(:foo, "some comment", {:bar => "baz\nbaz"})
+        gauge.set(5.0)
+
+        registry.to_text.should eq(<<-OUTPUT
+# HELP foo some comment
+# TYPE foo gauge
+foo{bar="baz\\nbaz"} 5.0
+
+OUTPUT
+        )
       end
     end
   end

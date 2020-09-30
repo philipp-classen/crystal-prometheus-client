@@ -11,4 +11,14 @@ describe Prometheus::Client do
       Prometheus::Client.registry.should eq(Prometheus::Client.registry)
     end
   end
+
+  describe ".to_text" do
+    it "allows to export stats to a String" do
+      Prometheus::Client.to_text.should be_a(String)
+    end
+
+    it "allows to export stats to IO" do
+      Prometheus::Client.to_text(IO::Memory.new).should be_nil
+    end
+  end
 end

@@ -67,4 +67,23 @@ describe Prometheus::Client::Histogram do
       end
     end
   end
+
+  describe "#reset!" do
+    it "restores the state after construction" do
+      with_histogram do |histogram|
+        histogram.values.should be_empty
+        histogram.observe(42.0)
+        histogram.values.should_not be_empty
+
+        histogram.reset!
+        histogram.values.should be_empty
+
+        histogram.observe(42.0, {:some_internal_label => "test"})
+        histogram.values.should_not be_empty
+
+        histogram.reset!
+        histogram.values.should be_empty
+      end
+    end
+  end
 end

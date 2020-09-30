@@ -8,6 +8,7 @@ module Prometheus
       getter buckets
 
       def initialize(@name : Symbol, @docstring : String, @base_labels = {} of Symbol => String, @buckets = DEFAULT_BUCKETS)
+        @bucket_values = Hash(Hash(Symbol, String), Value).new { |h, k| h[k] = Value.new(buckets) }
         Value.validate_buckets(buckets)
         super(name, docstring, base_labels)
       end
@@ -17,7 +18,11 @@ module Prometheus
       end
 
       def values
-        @bucket_values ||= Hash(Hash(Symbol, String), Value).new { |h, k| h[k] = Value.new(buckets) }
+        @bucket_values
+      end
+
+      def reset!
+        @bucket_values.clear
       end
 
       private def to_text_impl(io : IO)

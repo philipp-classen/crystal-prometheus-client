@@ -43,4 +43,23 @@ describe Prometheus::Client::Counter do
       end
     end
   end
+
+  describe "#reset!" do
+    it "restores the state after construction" do
+      with_counter do |counter|
+        counter.values.should be_empty
+        counter.inc
+        counter.values.should_not be_empty
+
+        counter.reset!
+        counter.values.should be_empty
+
+        counter.inc({:some_internal_label => "test"})
+        counter.values.should_not be_empty
+
+        counter.reset!
+        counter.values.should be_empty
+      end
+    end
+  end
 end

@@ -4,6 +4,13 @@ require "../internal-logger"
 module Prometheus
   module Client
     class Counter < Metric
+      getter values
+
+      def initialize(@name : Symbol, @docstring : String, @base_labels = {} of Symbol => String)
+        @values = Hash(Hash(Symbol, String), Float64).new { |h, k| h[k] = 0.0 }
+        super(name, docstring, base_labels)
+      end
+
       def inc(labels = {} of Symbol => String)
         inc(1.0, labels)
       end
@@ -23,6 +30,10 @@ module Prometheus
           Prometheus::Crystal::Client::Log.warn { "truncation detected for counter #{name}[labels=#{merged_labels}]: #{old_value} => #{value}" }
         end
         values[merged_labels] = value.to_f64
+      end
+
+      def reset!
+        @values.clear
       end
 
       private def to_text_impl(io : IO)

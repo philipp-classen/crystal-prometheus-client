@@ -74,4 +74,23 @@ describe Prometheus::Client::Gauge do
       end
     end
   end
+
+  describe "#reset!" do
+    it "restores the state after construction" do
+      with_gauge do |gauge|
+        gauge.values.should be_empty
+        gauge.inc
+        gauge.values.should_not be_empty
+
+        gauge.reset!
+        gauge.values.should be_empty
+
+        gauge.inc({:some_internal_label => "test"})
+        gauge.values.should_not be_empty
+
+        gauge.reset!
+        gauge.values.should be_empty
+      end
+    end
+  end
 end
